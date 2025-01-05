@@ -2,6 +2,8 @@ const fs = require('fs');
 const mqtt = require('mqtt');
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const caPath = path.join(__dirname, 'emqxsl-ca.crt');
 
 const app = express();
 const PORT = 3000; // Port for the REST API
@@ -24,7 +26,7 @@ const client = mqtt.connect(connectUrl, {
   username: 'emqx',
   password: 'aiinfox',
   reconnectPeriod: 1000,
-  ca: fs.readFileSync('./emqxsl-ca.crt'),
+  ca: fs.readFileSync(caPath),
 });
 
 const topic = 't/#';
@@ -76,6 +78,15 @@ app.get('/subscribe', (req, res) => {
 // Handle received messages
 client.on('message', (topic, payload) => {
   console.log('Received Message:', topic, payload.toString());
+});
+
+client.on('error', (error) => {
+    console.error('MQTT Connection Error:', error);
+});
+
+app.use((err, req, res, next) => {
+    console.error('Server Error:', err);
+    res.status(500).json({ success: false, error: err.message });
 });
 
 // Start the Express server
