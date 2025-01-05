@@ -12,9 +12,6 @@
         "src": "/.*",
         "dest": "/server.js"
       }
-    ],
-    "files": [
-      "emqxsl-ca.crt"
     ]
   }
   
